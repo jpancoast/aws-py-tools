@@ -14,7 +14,7 @@ checkSGForOutboundAll.py: This script checks all security groups in a region (an
             -r|--region OPTIONAL (us-west-2 default)
             -v|--vpc_id OPTIONAL
 
-deleteLaunchConfigurations.py: This script deletes all unused launch configurations ina region.
+deleteLaunchConfigurations.py: This script deletes all unused launch configurations in a region.
 
     Usage:
         ./deleteLaunchConfigurations.py -e|--environment=<environment. Environment is an entry 
