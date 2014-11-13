@@ -45,6 +45,11 @@ class AWSPyTools():
         self.__connect()
         self.__loadOrDownload()
 
+    def getVolumes(self):
+        #vols = conn.get_all_volumes(filters={ 'tag:' + config['tag_name']: config['tag_value'] })
+        vols = self.conn.get_all_volumes()
+        return vols
+
     def loadSecurityGroups(self):
         if len(self.securityGroupsDict.keys()) == 0:
             if self.debug:
