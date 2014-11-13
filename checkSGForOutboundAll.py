@@ -6,8 +6,8 @@ import boto.ec2
 import operator
 import getopt
 
-from AWSPyTools import ParseOptions
-from AWSPyTools import AWSPyTools
+from lib.AWSPyTools import ParseOptions
+from lib.AWSPyTools import AWSPyTools
 
 
 def main(argv):

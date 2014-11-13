@@ -5,8 +5,8 @@ import sys
 import signal
 import yaml
 
-from AWSPyTools import ParseOptions
-from AWSPyTools import AWSPyTools
+from lib.AWSPyTools import ParseOptions
+from lib.AWSPyTools import AWSPyTools
 
 from jinja2 import Template
 
