@@ -67,7 +67,6 @@ def main(argv):
     for sgName in sgs:
         sg = sgs[sgName]
 
-        print "blah: " + sg.name + ", id: " + sg.id
         '''
         Inbound rules
         '''
@@ -75,9 +74,8 @@ def main(argv):
             for rule in sg.rules:
                 for grant in rule.grants:
                     if grant.group_id is not None:
-                        print "grant.group_id: " + grant.group_id
                         if grant.group_id == sg_id:
-                            ingress_refs[grant.group_id] = str(sg.name)
+                            ingress_refs[sg.id] = str(sg.name)
     
         '''
         Egress rules
@@ -87,7 +85,7 @@ def main(argv):
                 for grant in rule.grants:
                     if grant.group_id is not None:
                         if grant.group_id == sg_id:
-                            egress_refs[grant.group_id] = str(sg.name)
+                            egress_refs[sg.id] = str(sg.name)
 
 
     if len(ingress_refs) > 0:
