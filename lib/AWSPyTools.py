@@ -109,7 +109,7 @@ class AWSPyTools():
         if nameOrId not in self.securityGroupsDict:
             return None
         else:
-            return SecurityGroup(self.securityGroupsDict, nameOrId)
+            return pickle.loads(self.securityGroupsDict[nameOrId])
 
     def getSecurityGroupNameFromId(self, sgId):
         self.loadSecurityGroups()
