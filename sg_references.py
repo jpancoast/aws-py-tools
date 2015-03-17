@@ -55,9 +55,9 @@ def main(argv):
     interface_refs = {}
     instance_refs = {}
     lb_refs = {} 
+    rds_refs = {}
 
     elasticache_refs = {}   #JAMESP
-    rds_refs = {}   #JAMESP
 
     awsPyTools = AWSPyTools(
         region=region, environment=profile, loadFromFile=False, debug=debug)
@@ -73,7 +73,7 @@ def main(argv):
     instances = awsPyTools.instances()
     load_balancers = awsPyTools.loadBalancers()
     rds_instances = awsPyTools.get_all_rds_instances()
-
+    elasticache_instances = awsPyTools.get_all_elasticache_clusters()
     
     for sgName in sgs:
         sg = sgs[sgName]
@@ -124,6 +124,13 @@ def main(argv):
             if group_id == sg_id:
                 lb_refs[lb_name] = lb_name
 
+    for rds_instance_id in rds_instances:
+        rds_instance = rds_instances[rds_instance_id]
+
+        for vpc_groups in rds_instance['VpcSecurityGroups']:
+            if vpc_groups['VpcSecurityGroupId'] == sg_id:
+                rds_refs[rds_instance_id] = rds_instance['DBInstanceIdentifier']
+
 
     '''
     Output the info
@@ -163,6 +170,14 @@ def main(argv):
 
         for lb_name in lb_refs:
             print "\t" + lb_name
+
+        print
+
+    if len(rds_refs) > 0:
+        print sg_looking_for.name + " is used on the following RDS Instances: "
+
+        for instance_id in rds_refs:
+            print "\t" + rds_refs[instance_id] + ", " + instance_id
 
         print
 

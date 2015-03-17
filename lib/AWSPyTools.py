@@ -11,6 +11,7 @@ import pdb
 import boto.ec2
 import boto.rds2
 import boto.ec2.elb
+import boto.elasticache
 
 import cPickle as pickle
 
@@ -49,9 +50,8 @@ class AWSPyTools():
         self.conn = None
         self.lb_conn = None
         self.rds_conn = None
+        self.elasticache_conn = None
 
-
-        #self.__connect()
         self.__loadOrDownload()
 
     def get_ec2_conn(self):
@@ -72,6 +72,15 @@ class AWSPyTools():
 
         return self.rds_conn
 
+    def get_elasticache_conn(self):
+        if self.elasticache_conn is None:
+            self.__elasticache_connect()
+
+        return self.elasticache_conn
+
+    def __elasticache_connect(self):
+        self.elasticache_conn = boto.elasticache.connect_to_region(
+            self.awsRegion, profile_name=self.awsEnv)
 
     def __ec2_connect(self):
         self.conn = boto.ec2.connect_to_region(
@@ -168,6 +177,17 @@ class AWSPyTools():
         self.__save()
         return self.instancesDict
 
+    def get_all_elasticache_clusters(self):
+        elasticache_instances = self.get_elasticache_conn().describe_cache_clusters()
+#        pp = pprint.PrettyPrinter(indent=4)
+#        pp.pprint(elasticache_instances)
+        
+        for elasticache_instance in elasticache_instances['DescribeCacheClustersResponse']['DescribeCacheClustersResult']['CacheClusters']:
+            print "lkasjdfsj"
+            pp.pprint(elasticache_instance)
+            print
+        
+
     '''
     # New
     >>> instances = rds2_conn.describe_db_instances()
@@ -178,18 +198,10 @@ class AWSPyTools():
     '''
     def get_all_rds_instances(self):
         rds_instances = self.get_rds_conn().describe_db_instances()
+    
+        for rds_instance in rds_instances['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances']:
 
-#        inst = rds_instances['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances'][0]
-#        print inst
-
-        
-        
-        for idx in rds_instances:
-            print idx
-            rds_instance = idx['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances']
-            print rds_instance
-            #self.rds_instances_dict[rds_instance.id] = rds_instance
-        
+            self.rds_instances_dict[rds_instance['Endpoint']['Address']] = rds_instance
 
         self.__save()
         return self.rds_instances_dict
