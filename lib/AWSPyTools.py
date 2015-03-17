@@ -9,6 +9,8 @@ import pprint
 import pdb
 
 import boto.ec2
+import boto.rds2
+import boto.ec2.elb
 
 import cPickle as pickle
 
@@ -26,7 +28,9 @@ class AWSPyTools():
         self.instancesDict = {}
         self.securityGroupsDict = {}
         self.interfacesDict = {}
+        self.lbDict = {}
         self.allInfo = {}
+        self.rds_instances_dict = {}
 
         self.fileBasePath = '/tmp'
         self.loadFromFile = loadFromFile
@@ -42,12 +46,49 @@ class AWSPyTools():
 
         self.debug = debug
 
-        self.__connect()
+        self.conn = None
+        self.lb_conn = None
+        self.rds_conn = None
+
+
+        #self.__connect()
         self.__loadOrDownload()
+
+    def get_ec2_conn(self):
+        if self.conn is None:
+            self.__ec2_connect()
+
+        return self.conn
+
+    def get_lb_conn(self):
+        if self.lb_conn is None:
+            self.__lb_connect()
+
+        return self.lb_conn
+
+    def get_rds_conn(self):
+        if self.rds_conn is None:
+            self.__rds_connect()
+
+        return self.rds_conn
+
+
+    def __ec2_connect(self):
+        self.conn = boto.ec2.connect_to_region(
+            self.awsRegion, profile_name=self.awsEnv)
+
+    def __lb_connect(self):
+        self.lb_conn = boto.ec2.elb.connect_to_region(
+            self.awsRegion, profile_name=self.awsEnv)
+
+    def __rds_connect(self):
+        self.rds_conn = boto.rds2.connect_to_region(
+            self.awsRegion, profile_name=self.awsEnv)
+
 
     def getVolumes(self):
         #vols = conn.get_all_volumes(filters={ 'tag:' + config['tag_name']: config['tag_value'] })
-        vols = self.conn.get_all_volumes()
+        vols = self.get_ec2_conn().get_all_volumes()
         return vols
 
     def loadSecurityGroups(self):
@@ -68,7 +109,7 @@ class AWSPyTools():
                 if self.debug:
                     print "Loading From Amazon"
 
-                sgs = self.conn.get_all_security_groups()
+                sgs = self.get_ec2_conn().get_all_security_groups()
 
                 for sg in sgs:
                     """
@@ -81,9 +122,9 @@ class AWSPyTools():
 
     def revokeSGRule(self, type, sg, rule, grant):
         if type == 'egress':
-            self.conn.revoke_security_group_egress(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
+            self.get_ec2_conn().revoke_security_group_egress(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
         elif type == 'ingress':
-            self.conn.revoke_security_group(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_security_group_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
+            self.get_ec2_conn().revoke_security_group(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_security_group_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
         
 
     def getAllSecurityGroups(self, vpc_id=None, idOn='sgName'):
@@ -119,7 +160,7 @@ class AWSPyTools():
         return temp.name
 
     def instances(self):
-        instances = self.conn.get_only_instances()
+        instances = self.get_ec2_conn().get_only_instances()
 
         for instance in instances:
             self.instancesDict[instance.id] = instance
@@ -127,14 +168,49 @@ class AWSPyTools():
         self.__save()
         return self.instancesDict
 
+    '''
+    # New
+    >>> instances = rds2_conn.describe_db_instances()
+    >>> inst = instances['DescribeDBInstancesResponse']\
+    ...                 ['DescribeDBInstancesResult']['DBInstances'][0]
+    >>> inst['DBName']
+    'test-db'
+    '''
+    def get_all_rds_instances(self):
+        rds_instances = self.get_rds_conn().describe_db_instances()
+
+#        inst = rds_instances['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances'][0]
+#        print inst
+
+        
+        
+        for idx in rds_instances:
+            print idx
+            rds_instance = idx['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances']
+            print rds_instance
+            #self.rds_instances_dict[rds_instance.id] = rds_instance
+        
+
+        self.__save()
+        return self.rds_instances_dict
+
     def interfaces(self):
-        interfaces = self.conn.get_all_network_interfaces()
+        interfaces = self.get_ec2_conn().get_all_network_interfaces()
 
         for interface in interfaces:
             self.interfacesDict[interface.id] = interface
 
         self.__save()
         return self.interfacesDict
+
+    def loadBalancers(self):
+        lbs = self.get_lb_conn().get_all_load_balancers()
+
+        for lb in lbs:
+            self.lbDict[lb.name] = lb
+
+        self.__save()
+        return self.lbDict
 
     def listSecurityGroups(self, vpc_id=None, idOn='sgName'):
         self.loadSecurityGroups()
@@ -167,8 +243,14 @@ class AWSPyTools():
         if len(self.interfacesDict.keys()) > 0:
             allTheThings['interfaces'] = self.interfacesDict
 
+        if len(self.lbDict.keys()) > 0:
+            allTheThings['loadBalancers'] = self.interfacesDict
+
         if len(self.instancesDict.keys()) > 0:
             allTheThings['instances'] = self.instancesDict
+
+        if len(self.rds_instances_dict.keys()) > 0:
+            allTheThings['rds_instances'] = self.rds_instances_dict
 
         with open(self.fileBasePath + '/' + self.dictFile, 'wb') as f:
             pickle.dump(allTheThings, f, pickle.HIGHEST_PROTOCOL)
@@ -197,9 +279,6 @@ class AWSPyTools():
                 else:
                     print "greater than"
 
-    def __connect(self):
-        self.conn = boto.ec2.connect_to_region(
-            self.awsRegion, profile_name=self.awsEnv)
 
 
 class SecurityGroup():

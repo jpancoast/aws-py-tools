@@ -54,6 +54,10 @@ def main(argv):
     egress_refs = {}
     interface_refs = {}
     instance_refs = {}
+    lb_refs = {} 
+
+    elasticache_refs = {}   #JAMESP
+    rds_refs = {}   #JAMESP
 
     awsPyTools = AWSPyTools(
         region=region, environment=profile, loadFromFile=False, debug=debug)
@@ -67,6 +71,9 @@ def main(argv):
     sgs = awsPyTools.getAllSecurityGroups(vpc_id=vpc_id)
     interfaces = awsPyTools.interfaces()
     instances = awsPyTools.instances()
+    load_balancers = awsPyTools.loadBalancers()
+    rds_instances = awsPyTools.get_all_rds_instances()
+
     
     for sgName in sgs:
         sg = sgs[sgName]
@@ -110,6 +117,14 @@ def main(argv):
                 instance_refs[instance_id] = instance_id
             
 
+    for lb_name in load_balancers:
+        lb = load_balancers[lb_name]
+        
+        for group_id in lb.security_groups:
+            if group_id == sg_id:
+                lb_refs[lb_name] = lb_name
+
+
     '''
     Output the info
     '''
@@ -121,20 +136,34 @@ def main(argv):
 
     if len(egress_refs) > 0:
         print sg_looking_for.name + " is referenced in the outbound rules in the following groups: "
+        
         for eg_sg_id in egress_refs:
             print "\t" + egress_refs[eg_sg_id]
+        
         print
 
     if len(interface_refs) > 0:
         print sg_looking_for.name + " is used on the following interfaces: "
+        
         for int_id in interface_refs:
             print "\t" + int_id
+        
         print
     
     if len(instance_refs) > 0:
         print sg_looking_for.name + " is used on the following instances: "
+        
         for instance_id in instance_refs:
             print "\t" + instance_id
+
+        print
+
+    if len(lb_refs) > 0:
+        print sg_looking_for.name + " is used on the following Load Balancers: "
+
+        for lb_name in lb_refs:
+            print "\t" + lb_name
+
         print
 
 
