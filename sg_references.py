@@ -49,6 +49,12 @@ def main(argv):
     vpc_id = arguments['--vpcid']
     region = arguments['--region']
 
+    
+    ingress_refs = {}
+    egress_refs = {}
+    interface_refs = {}
+    instance_refs = {}
+
     awsPyTools = AWSPyTools(
         region=region, environment=profile, loadFromFile=False, debug=debug)
 
@@ -56,13 +62,11 @@ def main(argv):
     sg_looking_for = awsPyTools.getSecurityGroup(sgnameorid)
     sg_id = sg_looking_for.id 
 
-    print "sg ID: " + sg_id + ", name from lib: " + sg_looking_for.name
+    print "sg ID: " + sg_id + ", name from lib: " + sg_looking_for.name + "\n"
 
     sgs = awsPyTools.getAllSecurityGroups(vpc_id=vpc_id)
-    
-    ingress_refs = {}
-    egress_refs = {}
-
+    interfaces = awsPyTools.interfaces()
+    instances = awsPyTools.instances()
     
     for sgName in sgs:
         sg = sgs[sgName]
@@ -88,15 +92,51 @@ def main(argv):
                             egress_refs[sg.id] = str(sg.name)
 
 
+
+
+    for interface_id in interfaces:
+        groups = interfaces[interface_id].groups #This is a list
+
+        for group in groups:
+            if group.id == sg_id:
+                interface_refs[interface_id] = interface_id
+
+
+    for instance_id in instances:
+        groups = instances[instance_id].groups
+
+        for group in groups:
+            if group.id == sg_id:
+                instance_refs[instance_id] = instance_id
+            
+
+    '''
+    Output the info
+    '''
     if len(ingress_refs) > 0:
-        print "Ingress Refs: "
+        print sg_looking_for.name + " is referenced in the inbound rules in the following groups: "
         for ing_sg_id in ingress_refs:
-            print ingress_refs[ing_sg_id]
+            print "\t" + ingress_refs[ing_sg_id]
+        print
 
     if len(egress_refs) > 0:
-        print "Egress Refs: "
+        print sg_looking_for.name + " is referenced in the outbound rules in the following groups: "
         for eg_sg_id in egress_refs:
-            print egress_refs[eg_sg_id]
+            print "\t" + egress_refs[eg_sg_id]
+        print
+
+    if len(interface_refs) > 0:
+        print sg_looking_for.name + " is used on the following interfaces: "
+        for int_id in interface_refs:
+            print "\t" + int_id
+        print
+    
+    if len(instance_refs) > 0:
+        print sg_looking_for.name + " is used on the following instances: "
+        for instance_id in instance_refs:
+            print "\t" + instance_id
+        print
+
 
 def signal_handler(signal, frame):
     print sys.argv[0] + " exited via keyboard interrupt."

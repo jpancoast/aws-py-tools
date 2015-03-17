@@ -119,23 +119,19 @@ class AWSPyTools():
         return temp.name
 
     def instances(self):
-        print "getAllInstanceInfo"
-
         instances = self.conn.get_only_instances()
 
         for instance in instances:
-            print instance.groups
             self.instancesDict[instance.id] = instance
 
         self.__save()
         return self.instancesDict
 
     def interfaces(self):
-        print "interfaces"
         interfaces = self.conn.get_all_network_interfaces()
 
         for interface in interfaces:
-            print interface
+            self.interfacesDict[interface.id] = interface
 
         self.__save()
         return self.interfacesDict
