@@ -27,6 +27,7 @@ VERSION = '0.1'
 
 import sys
 import signal
+import pprint
 
 from lib.AWSPyTools import AWSPyTools
 
@@ -66,14 +67,14 @@ def main(argv):
     sg_looking_for = awsPyTools.getSecurityGroup(sgnameorid)
     sg_id = sg_looking_for.id 
 
-    print "sg ID: " + sg_id + ", name from lib: " + sg_looking_for.name + "\n"
+    print "sg ID: " + sg_id + ", name/sgid given on cli: " + sgnameorid + ", name from lib: " + sg_looking_for.name + "\n"
 
     sgs = awsPyTools.getAllSecurityGroups(vpc_id=vpc_id)
     interfaces = awsPyTools.interfaces()
     instances = awsPyTools.instances()
     load_balancers = awsPyTools.loadBalancers()
     rds_instances = awsPyTools.get_all_rds_instances()
-    elasticache_instances = awsPyTools.get_all_elasticache_clusters()
+    elasticache_clusters = awsPyTools.get_all_elasticache_clusters()
     
     for sgName in sgs:
         sg = sgs[sgName]
@@ -132,6 +133,12 @@ def main(argv):
                 rds_refs[rds_instance_id] = rds_instance['DBInstanceIdentifier']
 
 
+    for elasticache_cluster in elasticache_clusters:
+        for group in elasticache_clusters[elasticache_cluster]['SecurityGroups']:
+            if group['SecurityGroupId'] == sg_id:
+                elasticache_refs[elasticache_clusters[elasticache_cluster]['CacheClusterId']] = elasticache_clusters[elasticache_cluster]['CacheClusterId']
+
+
     '''
     Output the info
     '''
@@ -181,6 +188,13 @@ def main(argv):
 
         print
 
+    if len(elasticache_refs) > 0:
+        print sg_looking_for.name + " is used in the following elasticache clusters: "
+
+        for elasticache_cluster_id in elasticache_refs:
+            print "\t" + elasticache_cluster_id
+
+        print
 
 def signal_handler(signal, frame):
     print sys.argv[0] + " exited via keyboard interrupt."

@@ -22,7 +22,10 @@ except ImportError, e:
     print "If you don't have pip, do this first: sudo easy_install pip"
     exit(2)
 
-
+'''
+TODO:
+    'objectify' elasticache, rds, instance, interfaces, lbs
+'''
 class AWSPyTools():
 
     def __init__(self, region='region', environment='env', loadFromFile=True, debug=False):
@@ -32,6 +35,7 @@ class AWSPyTools():
         self.lbDict = {}
         self.allInfo = {}
         self.rds_instances_dict = {}
+        self.elasticache_clusters_dict = {}
 
         self.fileBasePath = '/tmp'
         self.loadFromFile = loadFromFile
@@ -178,24 +182,14 @@ class AWSPyTools():
         return self.instancesDict
 
     def get_all_elasticache_clusters(self):
-        elasticache_instances = self.get_elasticache_conn().describe_cache_clusters()
-#        pp = pprint.PrettyPrinter(indent=4)
-#        pp.pprint(elasticache_instances)
+        elasticache_clusters = self.get_elasticache_conn().describe_cache_clusters()
         
-        for elasticache_instance in elasticache_instances['DescribeCacheClustersResponse']['DescribeCacheClustersResult']['CacheClusters']:
-            print "lkasjdfsj"
-            pp.pprint(elasticache_instance)
-            print
-        
+        for elasticache_cluster in elasticache_clusters['DescribeCacheClustersResponse']['DescribeCacheClustersResult']['CacheClusters']:
+            self.elasticache_clusters_dict[elasticache_cluster['CacheClusterId']] = elasticache_cluster
 
-    '''
-    # New
-    >>> instances = rds2_conn.describe_db_instances()
-    >>> inst = instances['DescribeDBInstancesResponse']\
-    ...                 ['DescribeDBInstancesResult']['DBInstances'][0]
-    >>> inst['DBName']
-    'test-db'
-    '''
+        self.__save()
+        return self.elasticache_clusters_dict
+
     def get_all_rds_instances(self):
         rds_instances = self.get_rds_conn().describe_db_instances()
     
@@ -407,6 +401,9 @@ class SecurityGroup():
         return tempRule
 
 
+'''
+Can probably deprecate the following ParseOptions class now that I've figured out docopt
+'''
 class ParseOptions():
 
     def __init__(self, argv):
