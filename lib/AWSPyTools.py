@@ -26,6 +26,8 @@ except ImportError, e:
 TODO:
     'objectify' elasticache, rds, instance, interfaces, lbs
 '''
+
+
 class AWSPyTools():
 
     def __init__(self, region='region', environment='env', loadFromFile=True, debug=False):
@@ -98,7 +100,6 @@ class AWSPyTools():
         self.rds_conn = boto.rds2.connect_to_region(
             self.awsRegion, profile_name=self.awsEnv)
 
-
     def getVolumes(self):
         #vols = conn.get_all_volumes(filters={ 'tag:' + config['tag_name']: config['tag_value'] })
         vols = self.get_ec2_conn().get_all_volumes()
@@ -135,10 +136,11 @@ class AWSPyTools():
 
     def revokeSGRule(self, type, sg, rule, grant):
         if type == 'egress':
-            self.get_ec2_conn().revoke_security_group_egress(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
+            self.get_ec2_conn().revoke_security_group_egress(group_id=sg.id, ip_protocol=rule.ip_protocol,
+                                                             from_port=rule.from_port, to_port=rule.to_port, src_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
         elif type == 'ingress':
-            self.get_ec2_conn().revoke_security_group(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port, to_port=rule.to_port, src_security_group_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
-        
+            self.get_ec2_conn().revoke_security_group(group_id=sg.id, ip_protocol=rule.ip_protocol, from_port=rule.from_port,
+                                                      to_port=rule.to_port, src_security_group_group_id=grant.group_id, cidr_ip=grant.cidr_ip)
 
     def getAllSecurityGroups(self, vpc_id=None, idOn='sgName'):
         self.loadSecurityGroups()
@@ -182,20 +184,23 @@ class AWSPyTools():
         return self.instancesDict
 
     def get_all_elasticache_clusters(self):
-        elasticache_clusters = self.get_elasticache_conn().describe_cache_clusters()
-        
+        elasticache_clusters = self.get_elasticache_conn(
+        ).describe_cache_clusters()
+
         for elasticache_cluster in elasticache_clusters['DescribeCacheClustersResponse']['DescribeCacheClustersResult']['CacheClusters']:
-            self.elasticache_clusters_dict[elasticache_cluster['CacheClusterId']] = elasticache_cluster
+            self.elasticache_clusters_dict[
+                elasticache_cluster['CacheClusterId']] = elasticache_cluster
 
         self.__save()
         return self.elasticache_clusters_dict
 
     def get_all_rds_instances(self):
         rds_instances = self.get_rds_conn().describe_db_instances()
-    
+
         for rds_instance in rds_instances['DescribeDBInstancesResponse']['DescribeDBInstancesResult']['DBInstances']:
 
-            self.rds_instances_dict[rds_instance['Endpoint']['Address']] = rds_instance
+            self.rds_instances_dict[
+                rds_instance['Endpoint']['Address']] = rds_instance
 
         self.__save()
         return self.rds_instances_dict
@@ -284,7 +289,6 @@ class AWSPyTools():
                     self.loadFromFile = False
                 else:
                     print "greater than"
-
 
 
 class SecurityGroup():
@@ -404,6 +408,8 @@ class SecurityGroup():
 '''
 Can probably deprecate the following ParseOptions class now that I've figured out docopt
 '''
+
+
 class ParseOptions():
 
     def __init__(self, argv):
