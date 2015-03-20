@@ -291,6 +291,9 @@ class AWSPyTools():
                     print "greater than"
 
 
+'''
+This class isn't actually used right now I don't think...
+'''
 class SecurityGroup():
 
     def __init__(self, sgDict, nameOrId):
@@ -408,8 +411,6 @@ class SecurityGroup():
 '''
 Can probably deprecate the following ParseOptions class now that I've figured out docopt
 '''
-
-
 class ParseOptions():
 
     def __init__(self, argv):
