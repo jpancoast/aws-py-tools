@@ -23,6 +23,11 @@ Email: jpancoast@gmail.com
 twitter.com/jpancoast
 """
 
+"""
+TODO:
+    If an ENI is the primary (ie, eth0) interface for an instance that's already been output, don't display it.
+"""
+
 VERSION = '0.1'
 
 import sys
@@ -158,19 +163,19 @@ def main(argv):
 
         print
 
-    if len(interface_refs) > 0:
-        print sg_looking_for.name + " is used on the following interfaces: "
-
-        for int_id in interface_refs:
-            print "\t" + int_id
-
-        print
-
     if len(instance_refs) > 0:
         print sg_looking_for.name + " is used on the following instances: "
 
         for instance_id in instance_refs:
             print "\t" + instance_id
+
+        print
+
+    if len(interface_refs) > 0:
+        print sg_looking_for.name + " is used on the following interfaces: "
+
+        for int_id in interface_refs:
+            print "\t" + int_id
 
         print
 
