@@ -9,7 +9,7 @@ Usage:
 Options:
     --help  Show this screen
     --version   Show version
-    -s, --sgname=<sgname>  Security Group Name or ID
+    -s, --sgname=<sgname>  Security Group Name or ID, CaSe SEnsITiVe
     -v, --vpcid=<vpcid>  VPC ID.
     -p, --profile=<botoprofile>  Name of your boto profile to use to connect to AWS.
     -r, --region=<region> AWS Region
