@@ -26,6 +26,7 @@ twitter.com/jpancoast
 """
 TODO:
     If an ENI is the primary (ie, eth0) interface for an instance that's already been output, don't display it.
+    Check on whether it lets you delete a sg that's used in a launch config.
 """
 
 VERSION = '0.1'
