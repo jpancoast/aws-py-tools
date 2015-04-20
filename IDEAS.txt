@@ -1,0 +1,13 @@
+
+give it a security group, graph it's possible inbound and outbound connections.
+
+
+Create snapshots:
+http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-CreateSnapshot.html
+    Should also delete ones older than a week or so? Keep only the most current one, and the week old one?
+
+
+Rename security groups:
+    Something to rename security groups. You give it the old name, and the new name, and it changes it everywhere (instances, interfaces, other groups, everywhere) and deletes the old one.
+    If the new group already exists, it copies all rules in the old one that don't exist into the new one.
+
