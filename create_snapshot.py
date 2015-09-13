@@ -53,9 +53,6 @@ def main(argv):
     now_date = datetime.datetime.now() + datetime.timedelta(-15)
     description = "Compnor Data Volume Backup " + formatted_desc_date
 
-    print "'now' date: " + now_date.strftime('%m/%d/%Y')
-    print "Description: " + description
-
     if arguments['--vol_id'] is not None:
         vol_id = arguments['--vol_id']
 
@@ -84,17 +81,14 @@ def main(argv):
 
 
     for volume in volumes:
-        pp.pprint(volume.id)
+        volume.create_snapshot(description=description)
         
         for snapshot in volume.snapshots():
-            #pp.pprint(snapshot)
-            #print snapshot.start_time
-            #print snapshot.description
-            #print "---------------"
             start_time = datetime.datetime.strptime(snapshot.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
 
             if start_time < now_date:
-                print "Should delete this one: " + snapshot.description
+                print "Deleting this one: " + snapshot.description
+                snapshot.delete()
 
 
 if __name__ == "__main__":
