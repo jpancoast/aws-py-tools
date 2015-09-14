@@ -81,6 +81,7 @@ def main(argv):
 
 
     for volume in volumes:
+        print "Creating snapshot: " + description
         volume.create_snapshot(description=description)
         
         for snapshot in volume.snapshots():
