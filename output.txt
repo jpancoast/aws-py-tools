@@ -1,0 +1,72 @@
+---------------
+Boto Profile: jpancoast
+Region: us-east-1
+---------------
+
+volume.id: vol-1dd9b56a
+volume.create_time: 2013-11-08T19:58:47.000Z
+volume.status: in-use
+volume.size: 8
+volume.snapshot_id: snap-7962c379
+volume.zone: us-east-1a
+volume.type: standard
+volume.iops: None
+volume.encrypted: False
+-------
+volume.id: vol-d9128a91
+volume.create_time: 2014-10-04T03:13:04.544Z
+volume.status: in-use
+volume.size: 8
+volume.snapshot_id: snap-e49eb646
+volume.zone: us-east-1a
+volume.type: gp2
+volume.iops: 24
+volume.encrypted: False
+-------
+volume.id: vol-6fdfaa27
+volume.create_time: 2014-10-10T23:06:48.691Z
+volume.status: in-use
+volume.size: 8
+volume.snapshot_id: 
+volume.zone: us-east-1a
+volume.type: standard
+volume.iops: None
+volume.encrypted: False
+-------
+volume.id: vol-ca1ee180
+volume.create_time: 2015-03-05T03:31:17.231Z
+volume.status: in-use
+volume.size: 30
+volume.snapshot_id: snap-6ea5a3e0
+volume.zone: us-east-1a
+volume.type: gp2
+volume.iops: 90
+volume.encrypted: False
+-------
+volume.id: vol-cb1ae581
+volume.create_time: 2015-03-05T03:37:52.387Z
+volume.status: in-use
+volume.size: 30
+volume.snapshot_id: snap-6ea5a3e0
+volume.zone: us-east-1a
+volume.type: gp2
+volume.iops: 90
+volume.encrypted: False
+-------
+volume.id: vol-73e3f992
+volume.create_time: 2015-09-16T02:16:56.527Z
+volume.status: available
+volume.size: 4
+volume.snapshot_id: 
+volume.zone: us-east-1a
+volume.type: io1
+volume.iops: 100
+volume.encrypted: True
+-------
+
+Types:
+    io1: provisioned iops, ssd
+    standard: magnetic
+    gp2: general purpose ssd
+    1 gig, general purpose ssd
+    2 gig, magnetic
