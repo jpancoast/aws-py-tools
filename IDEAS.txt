@@ -1,10 +1,13 @@
 
+
+Script that tells you how many volumes/iops you're using
+
 give it a security group, graph it's possible inbound and outbound connections.
 
 
-Create snapshots:
-http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-CreateSnapshot.html
-    Should also delete ones older than a week or so? Keep only the most current one, and the week old one?
+#Create snapshots:
+#http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-CreateSnapshot.html
+#    Should also delete ones older than a week or so? Keep only the most current one, and the week old one?
 
 
 Rename security groups:
