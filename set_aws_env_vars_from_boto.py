@@ -32,6 +32,11 @@ Author: James Pancoast
 Email: jpancoast@gmail
 """
 
+"""
+TODO:
+    Read from aws/.config as well, or instead of.
+"""
+
 def main(argv):
     arguments = docopt(
         __doc__, version=str(os.path.basename(__file__)) + " " + VERSION, options_first=False)
