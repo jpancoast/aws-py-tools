@@ -38,14 +38,20 @@ def main(argv):
 
     config_file = os.path.expanduser('~/.boto')
 
-    print config_file
+    
     if arguments['--profile'] is not None:
         profile = arguments['--profile']
 
     print "---------------"
+    print config_file
     print "Boto Profile: " + str(profile)
     print "---------------\n"
 
+    '''
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_DEFAULT_REGION
+    '''
     profile_found = False
 
     with open(config_file) as fp:
@@ -56,17 +62,25 @@ def main(argv):
     profile_search_string = "profile " + profile
 
     for config_profile in profiles:
-        print "Profile looking for: (" + profile + ")"
-        print "config_profile: (" + config_profile + ")"
-
-
         if config_profile == profile_search_string:
             profile_found = True
 
+            aws_region = None
+
+            if config.has_option(config_profile, 'region'):
+                aws_region = config.get(config_profile, 'region')
+
             aws_access_key_id = config.get(config_profile, 'aws_access_key_id' )
             aws_secret_access_key = config.get(config_profile, 'aws_secret_access_key' )
-            print "aws_access_key_id: " + aws_access_key_id
-            print "aws_secret_access_key: " + aws_secret_access_key
+
+
+            print "Copy and paste the following into your shell:"
+            print "export AWS_ACCESS_KEY_ID=" + aws_access_key_id
+            print "export AWS_SECRET_ACCESS_KEY=" + aws_secret_access_key
+
+            if aws_region is not None:
+                print "export AWS_DEFAULT_REGION=" + aws_region
+
 
 
     if not profile_found:
