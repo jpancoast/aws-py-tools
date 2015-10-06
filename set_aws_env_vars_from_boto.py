@@ -4,12 +4,13 @@
 Create a snapshot for a given volume id.
 
 Usage:
-    create_snapshot.py (--profile=<profile>)
+    create_snapshot.py (--profile=<profile> --variable=<variable>)
 
 Options:
     --help  Show this screen
     --version  Show version
     -p, --profile=<profile_name> Boto profile to use.
+    -v, --variable=<variable> which variable to set.
 """
 
 VERSION = '0.1'
@@ -43,20 +44,14 @@ def main(argv):
 
     config_file = os.path.expanduser('~/.boto')
 
+    default_region = 'us-west-2'
     
     if arguments['--profile'] is not None:
         profile = arguments['--profile']
 
-    print "---------------"
-    print config_file
-    print "Boto Profile: " + str(profile)
-    print "---------------\n"
+    if arguments['--variable'] is not None:
+        variable = arguments['--variable'] 
 
-    '''
-    AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY
-    AWS_DEFAULT_REGION
-    '''
     profile_found = False
 
     with open(config_file) as fp:
@@ -66,6 +61,13 @@ def main(argv):
 
     profile_search_string = "profile " + profile
 
+    '''
+    aws-env-vars () {
+        export AWS_ACCESS_KEY_ID=`/Users/jpancoast/Stuff/code/git/github/aws-py-tools/set_aws_env_vars_from_boto.py -p $1 -v access_key`
+        export AWS_SECRET_ACCESS_KEY=`/Users/jpancoast/Stuff/code/git/github/aws-py-tools/set_aws_env_vars_from_boto.py -p $1 -v secret_key`
+        export AWS_DEFAULT_REGION=`/Users/jpancoast/Stuff/code/git/github/aws-py-tools/set_aws_env_vars_from_boto.py -p $1 -v region`
+    }
+    '''
     for config_profile in profiles:
         if config_profile == profile_search_string:
             profile_found = True
@@ -78,13 +80,17 @@ def main(argv):
             aws_access_key_id = config.get(config_profile, 'aws_access_key_id' )
             aws_secret_access_key = config.get(config_profile, 'aws_secret_access_key' )
 
+            if variable == 'access_key':
+                print aws_access_key_id
 
-            print "Copy and paste the following into your shell:"
-            print "export AWS_ACCESS_KEY_ID=" + aws_access_key_id
-            print "export AWS_SECRET_ACCESS_KEY=" + aws_secret_access_key
+            if variable == 'secret_key':
+                print aws_secret_access_key
 
-            if aws_region is not None:
-                print "export AWS_DEFAULT_REGION=" + aws_region
+            if variable == 'region':
+                if aws_region is not None:
+                    print aws_region
+                else:
+                    print default_region
 
 
 
