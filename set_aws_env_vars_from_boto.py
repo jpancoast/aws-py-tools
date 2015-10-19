@@ -4,7 +4,7 @@
 Create a snapshot for a given volume id.
 
 Usage:
-    create_snapshot.py (--profile=<profile> --variable=<variable>)
+    set_aws_env_fars_from_boto.py (--profile=<profile> --variable=<variable>)
 
 Options:
     --help  Show this screen
